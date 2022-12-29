@@ -8,8 +8,9 @@ class Product {
 }
 
 class Component {
-  constructor(parentSelector, shouldBeRendered = true) {
-    this.hook = parentSelector;
+  constructor(parentQuerySelecter, shouldBeRendered = true) {
+    this.hook = parentQuerySelecter;
+
     if (shouldBeRendered) {
       this.render();
     }
@@ -44,7 +45,14 @@ class ProductList extends Component {
       new Product(
         "Full metal alchemist",
         "https://static.catapult.co/cdn-cgi/image/width=1170,height=658,dpr=2,fit=cover,format=auto/production/stories/30190/cover_photos/original/fullmetal_site_1622753380_1637683000.jpg",
-        "Lorem ipsum"
+        "Lorem ipsum",
+        39.99
+      ),
+      new Product(
+        "Attack of the Titan",
+        "https://i.pinimg.com/originals/7a/0d/c2/7a0dc24f568b81a39ba1ce797f65d355.jpg",
+        "Lorem ipsum",
+        29.99
       ),
     ];
     this.#renderListItems();
@@ -72,7 +80,7 @@ class ProductListItem extends Component {
   }
 
   #addButtonHandler() {
-    App.addProductToCart(this.product);
+    App.addToCartHandler(this.product);
   }
 
   render() {
@@ -95,14 +103,15 @@ class ProductListItem extends Component {
 
 class ShoppingCart extends Component {
   #items = [];
+  #totalOutput;
 
   set #cartItems(items) {
     this.#items = [...items];
 
-    this.totalOutput.innerHTML = `<h2>Total $${this.totalPrice}</h2>`;
+    this.#totalOutput.innerHTML = `<h2>Total $${this.#totalPrice}</h2>`;
   }
 
-  get totalPrice() {
+  get #totalPrice() {
     let sum = 0;
 
     if (this.#items && this.#items.length > 0) {
@@ -115,7 +124,7 @@ class ShoppingCart extends Component {
   constructor(hook) {
     super(hook, false);
     this.orderHandler = () => {
-      console.log(this.#items);
+      alert(`Total amount: $${this.#totalPrice}`);
     };
     this.render();
   }
@@ -129,14 +138,14 @@ class ShoppingCart extends Component {
   render() {
     const shoppingCartSection = this.renderRootElement("section", "cart");
     shoppingCartSection.innerHTML = `
-			<h2>Total $${this.totalPrice}</h2>
+			<h2>Total $${this.#totalPrice}</h2>
 			<button>Order Now!</button>
 		`;
 
     const orderBtn = shoppingCartSection.querySelector("button");
     orderBtn.addEventListener("click", this.orderHandler);
 
-    this.totalOutput = shoppingCartSection.querySelector("h2");
+    this.#totalOutput = shoppingCartSection.querySelector("h2");
   }
 }
 
@@ -161,7 +170,7 @@ class App {
     this.#cart = new Shop("#app").cart;
   }
 
-  static addProductToCart(product) {
+  static addToCartHandler(product) {
     this.#cart.addProductToCart(product);
   }
 }
