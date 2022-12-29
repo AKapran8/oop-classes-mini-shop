@@ -4,7 +4,6 @@ class Product {
     this.imageUrl = url || "";
     this.price = price || 0;
     this.description = descr || "";
-    this.id = Math.random();
   }
 }
 
@@ -31,10 +30,10 @@ class ProductList extends Component {
 
   constructor(hook) {
     super(hook);
-    this.fetchProducts();
+    this.#fetchProducts();
   }
 
-  fetchProducts() {
+  #fetchProducts() {
     this.products = [
       new Product(
         "Classroom of the Elite",
@@ -48,10 +47,10 @@ class ProductList extends Component {
         "Lorem ipsum"
       ),
     ];
-    this.renderListItems();
+    this.#renderListItems();
   }
 
-  renderListItems() {
+  #renderListItems() {
     this.products.forEach((product) => {
       new ProductListItem(product, ".product-list");
     });
@@ -60,7 +59,7 @@ class ProductList extends Component {
   render() {
     this.renderRootElement("ul", "product-list");
     if (this.products && this.products.length > 0) {
-      this.renderListItems();
+      this.#renderListItems();
     }
   }
 }
@@ -72,7 +71,7 @@ class ProductListItem extends Component {
     this.render();
   }
 
-  _addButtonHandler() {
+  #addButtonHandler() {
     App.addProductToCart(this.product);
   }
 
@@ -90,15 +89,15 @@ class ProductListItem extends Component {
 			</div>`;
 
     const addBtn = productItem.querySelector("button");
-    addBtn.addEventListener("click", this._addButtonHandler.bind(this));
+    addBtn.addEventListener("click", this.#addButtonHandler.bind(this));
   }
 }
 
 class ShoppingCart extends Component {
-  items = [];
+  #items = [];
 
-  set cartItems(items) {
-    this.items = [...items];
+  set #cartItems(items) {
+    this.#items = [...items];
 
     this.totalOutput.innerHTML = `<h2>Total $${this.totalPrice}</h2>`;
   }
@@ -106,8 +105,8 @@ class ShoppingCart extends Component {
   get totalPrice() {
     let sum = 0;
 
-    if (this.items && this.items.length > 0) {
-      sum = this.items.reduce((prev, cur) => (prev += cur.price || 0), 0);
+    if (this.#items && this.#items.length > 0) {
+      sum = this.#items.reduce((prev, cur) => (prev += cur.price || 0), 0);
     }
 
     return +sum.toFixed(2);
@@ -116,16 +115,15 @@ class ShoppingCart extends Component {
   constructor(hook) {
     super(hook, false);
     this.orderHandler = () => {
-      console.log(this.items);
+      console.log(this.#items);
     };
     this.render();
   }
 
   addProductToCart(item) {
-    const updatedItems = [...this.items];
-    const isNewItem = this.items.findIndex((el) => el.id === item.id);
-    if (isNewItem === -1) updatedItems.push(item);
-    this.cartItems = [...updatedItems];
+    const updatedItems = [...this.#items];
+    updatedItems.push(item);
+    this.#cartItems = [...updatedItems];
   }
 
   render() {
@@ -157,14 +155,14 @@ class Shop {
 }
 
 class App {
-  static cart;
+  static #cart;
 
   static init() {
-    this.cart = new Shop("#app").cart;
+    this.#cart = new Shop("#app").cart;
   }
 
   static addProductToCart(product) {
-    this.cart.addProductToCart(product);
+    this.#cart.addProductToCart(product);
   }
 }
 
