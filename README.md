@@ -1,1 +1,1 @@
-# oop-mini-shop
+# oop-classes-mini-shop
