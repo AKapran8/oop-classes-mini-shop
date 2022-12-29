@@ -9,8 +9,11 @@ class Product {
 }
 
 class Component {
-  constructor(parentSelector) {
+  constructor(parentSelector, shouldBeRendered = true) {
     this.hook = parentSelector;
+    if (shouldBeRendered) {
+      this.render();
+    }
   }
 
   renderRootElement(tag, cssClasses) {
@@ -24,38 +27,47 @@ class Component {
 }
 
 class ProductList extends Component {
-  products = [
-    new Product(
-      "Classroom of the Elite",
-      "https://c4.wallpaperflare.com/wallpaper/847/293/159/anime-classroom-of-the-elite-kei-karuizawa-kiyotaka-ayanok%C5%8Dji-wallpaper-preview.jpg",
-      "Lorem ipsum dolor",
-      19.99
-    ),
-    new Product(
-      "Full metal alchemist",
-      "https://static.catapult.co/cdn-cgi/image/width=1170,height=658,dpr=2,fit=cover,format=auto/production/stories/30190/cover_photos/original/fullmetal_site_1622753380_1637683000.jpg",
-      "Lorem ipsum"
-    ),
-  ];
+  products = [];
 
   constructor(hook) {
     super(hook);
-    this.render();
+    this.fetchProducts();
+  }
+
+  fetchProducts() {
+    this.products = [
+      new Product(
+        "Classroom of the Elite",
+        "https://c4.wallpaperflare.com/wallpaper/847/293/159/anime-classroom-of-the-elite-kei-karuizawa-kiyotaka-ayanok%C5%8Dji-wallpaper-preview.jpg",
+        "Lorem ipsum dolor",
+        19.99
+      ),
+      new Product(
+        "Full metal alchemist",
+        "https://static.catapult.co/cdn-cgi/image/width=1170,height=658,dpr=2,fit=cover,format=auto/production/stories/30190/cover_photos/original/fullmetal_site_1622753380_1637683000.jpg",
+        "Lorem ipsum"
+      ),
+    ];
+    this.renderListItems();
+  }
+
+  renderListItems() {
+    this.products.forEach((product) => {
+      new ProductListItem(product, ".product-list");
+    });
   }
 
   render() {
     this.renderRootElement("ul", "product-list");
     if (this.products && this.products.length > 0) {
-      this.products.forEach((product) => {
-        new ProductListItem(product, ".product-list");
-      });
+      this.renderListItems();
     }
   }
 }
 
 class ProductListItem extends Component {
   constructor(product, hook) {
-    super(hook);
+    super(hook, false);
     this.product = product ? JSON.parse(JSON.stringify(product)) : {};
     this.render();
   }
