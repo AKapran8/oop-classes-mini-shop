@@ -1,8 +1,4 @@
 class Product {
-  title;
-  imageUrl;
-  price;
-  description;
   constructor(title, url, price, descr) {
     this.title = title;
     this.imageUrl = url;
@@ -11,8 +7,8 @@ class Product {
   }
 }
 
-const productsList = {
-  products: [
+class ProductList {
+  products = [
     new Product(
       "Class of the Elite",
       "https://c4.wallpaperflare.com/wallpaper/847/293/159/anime-classroom-of-the-elite-kei-karuizawa-kiyotaka-ayanok%C5%8Dji-wallpaper-preview.jpg",
@@ -25,31 +21,45 @@ const productsList = {
       39.99,
       "Lorem ipsum"
     ),
-  ],
+  ];
 
-  renderUI() {
+  constructor() {}
+
+  render() {
     const app = document.querySelector("#app");
 
     const list = document.createElement("ul");
     list.className = "product-list";
     this.products.forEach((el) => {
-      const li = document.createElement("li");
-      li.className = "product-item";
-      li.innerHTML = `
-				<div>
- 			  	<img src="${el.imageUrl}" alt="${el.title}" />
-    			<div class="product-item__content">
-						<h2>${el.title}</h2>
-						<h3>\$${el.price}</h3>
-						<p>${el.description}</p>
-						<button>Add to Card</button>
-					</div>
-				</div>`;
+      const li = new ProductListItem(el).render();
       list.append(li);
     });
 
     app.append(list);
-  },
-};
+  }
+}
 
-productsList.renderUI();
+class ProductListItem {
+  constructor(product) {
+    this.product = { ...product };
+  }
+
+  render() {
+    const li = document.createElement("li");
+    li.className = "product-item";
+    li.innerHTML = `
+			<div>
+				<img src="${this.product.imageUrl}" alt="${this.product.title}" />
+				<div class="product-item__content">
+					<h2>${this.product.title}</h2>
+					<h3>\$${this.product.price}</h3>
+					<p>${this.product.description}</p>
+					<button>Add to Card</button>
+				</div>
+			</div>`;
+    return li;
+  }
+}
+
+const productsList = new ProductList();
+productsList.render();
