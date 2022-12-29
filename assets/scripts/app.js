@@ -69,31 +69,34 @@ class ProductListItem {
 class ShoppingCart {
   items = [];
 
-  addProductToCart(item) {
-    const isAlreadyExist = this.items.findIndex((el) => el.id === item.id);
-    if (isAlreadyExist === -1) this.items.push(item);
+  set cartItems(items) {
+    this.items = [...items];
 
-    this._getTotalPrice();
-    this.totalOutput.innerHTML = `<h2>Total $${this._getTotalPrice()}</h2>`;
+    this.totalOutput.innerHTML = `<h2>Total $${this.totalPrice}</h2>`;
   }
 
-  _getTotalPrice() {
-    let totalPrice = 0;
+  get totalPrice() {
+    let sum = 0;
 
     if (this.items && this.items.length > 0) {
-      this.items.forEach((el) => {
-        totalPrice += el.price ? el.price : 0;
-      });
+      sum = this.items.reduce((prev, cur) => (prev += cur.price || 0), 0);
     }
 
-    return +totalPrice;
+    return +sum;
+  }
+
+  addProductToCart(item) {
+    const updatedItems = [...this.items];
+    const isNewItem = this.items.findIndex((el) => el.id === item.id);
+    if (isNewItem === -1) updatedItems.push(item);
+    this.cartItems = [...updatedItems];
   }
 
   render() {
     const shoppingCartSection = document.createElement("section");
     shoppingCartSection.className = "cart";
     shoppingCartSection.innerHTML = `
-			<h2>Total $${this._getTotalPrice()}</h2>
+			<h2>Total $${this.totalPrice}</h2>
 			<button>Order Now!</button>
 		`;
 
