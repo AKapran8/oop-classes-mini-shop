@@ -124,7 +124,7 @@ class ShoppingCart extends Component {
 
   constructor(hook) {
     super(hook, false);
-    this.orderHandler = () => {
+    this.#orderHandler = () => {
       alert(`Total amount: $${this.#totalPrice}`);
     };
     this.render();
@@ -144,7 +144,7 @@ class ShoppingCart extends Component {
 		`;
 
     const orderBtn = shoppingCartSection.querySelector("button");
-    orderBtn.addEventListener("click", this.orderHandler);
+    orderBtn.addEventListener("click", this.#orderHandler);
 
     this.#totalOutput = shoppingCartSection.querySelector("h2");
   }
