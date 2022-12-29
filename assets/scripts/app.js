@@ -23,43 +23,80 @@ class ProductList {
     ),
   ];
 
-  constructor() {}
-
   render() {
-    const app = document.querySelector("#app");
-
-    const list = document.createElement("ul");
-    list.className = "product-list";
-    this.products.forEach((el) => {
-      const li = new ProductListItem(el).render();
-      list.append(li);
+    const productsList = document.createElement("ul");
+    productsList.className = "product-list";
+    this.products.forEach((p) => {
+      const productItem = new ProductListItem(p).render();
+      productsList.append(productItem);
     });
 
-    app.append(list);
+    return productsList;
   }
 }
 
 class ProductListItem {
   constructor(product) {
-    this.product = { ...product };
+    this.product = JSON.parse(JSON.stringify(product));
+  }
+
+  _addButtonHandler() {
+    const q = new ShoppingCart();
+    q.addProductToCart(this.product);
   }
 
   render() {
-    const li = document.createElement("li");
-    li.className = "product-item";
-    li.innerHTML = `
+    const productItem = document.createElement("li");
+    productItem.className = "product-item";
+    productItem.innerHTML = `
 			<div>
 				<img src="${this.product.imageUrl}" alt="${this.product.title}" />
 				<div class="product-item__content">
 					<h2>${this.product.title}</h2>
-					<h3>\$${this.product.price}</h3>
+					<h3>$${this.product.price}</h3>
 					<p>${this.product.description}</p>
-					<button>Add to Card</button>
+					<button>Add to Cart</button>
 				</div>
 			</div>`;
-    return li;
+    const addBtn = productItem.querySelector("button");
+    addBtn.addEventListener("click", this._addButtonHandler.bind(this));
+
+    return productItem;
   }
 }
 
-const productsList = new ProductList();
-productsList.render();
+class ShoppingCart {
+  items = [];
+  totalValue = 0;
+
+  addProductToCart(item) {
+    this.items.push(item);
+    this.render();
+  }
+
+  render() {
+    const shoppingCartSection = document.createElement("section");
+    shoppingCartSection.className = "cart";
+    shoppingCartSection.innerHTML = `
+			<h2>Total $${this.totalValue}</h2>
+			<button>Order Now!</button>
+		`;
+
+    return shoppingCartSection;
+  }
+}
+
+class Shop {
+  render() {
+    const app = document.querySelector("#app");
+
+    const productList = new ProductList().render();
+    const shoppingCart = new ShoppingCart().render();
+
+    app.append(shoppingCart);
+    app.append(productList);
+  }
+}
+
+const shop = new Shop();
+shop.render();
