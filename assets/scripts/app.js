@@ -1,24 +1,24 @@
 class Product {
-  constructor(title, url, price, descr) {
-    this.title = title;
-    this.imageUrl = url;
-    this.price = price;
-    this.description = descr;
+  constructor(title, url, descr, price) {
+    this.title = title || "";
+    this.imageUrl = url || "";
+    this.price = price || 0;
+    this.description = descr || "";
+    this.id = Math.random();
   }
 }
 
 class ProductList {
   products = [
     new Product(
-      "Class of the Elite",
+      "Classroom of the Elite",
       "https://c4.wallpaperflare.com/wallpaper/847/293/159/anime-classroom-of-the-elite-kei-karuizawa-kiyotaka-ayanok%C5%8Dji-wallpaper-preview.jpg",
-      19.99,
-      "Lorem ipsum dolor"
+      "Lorem ipsum dolor",
+      19.99
     ),
     new Product(
       "Full metal alchemist",
       "https://static.catapult.co/cdn-cgi/image/width=1170,height=658,dpr=2,fit=cover,format=auto/production/stories/30190/cover_photos/original/fullmetal_site_1622753380_1637683000.jpg",
-      39.99,
       "Lorem ipsum"
     ),
   ];
@@ -26,8 +26,9 @@ class ProductList {
   render() {
     const productsList = document.createElement("ul");
     productsList.className = "product-list";
-    this.products.forEach((p) => {
-      const productItem = new ProductListItem(p).render();
+
+    this.products.forEach((product) => {
+      const productItem = new ProductListItem(product).render();
       productsList.append(productItem);
     });
 
@@ -37,12 +38,11 @@ class ProductList {
 
 class ProductListItem {
   constructor(product) {
-    this.product = JSON.parse(JSON.stringify(product));
+    this.product = product ? JSON.parse(JSON.stringify(product)) : {};
   }
 
   _addButtonHandler() {
-    const q = new ShoppingCart();
-    q.addProductToCart(this.product);
+    App.addProductToCart(this.product);
   }
 
   render() {
@@ -58,6 +58,7 @@ class ProductListItem {
 					<button>Add to Cart</button>
 				</div>
 			</div>`;
+
     const addBtn = productItem.querySelector("button");
     addBtn.addEventListener("click", this._addButtonHandler.bind(this));
 
@@ -67,36 +68,70 @@ class ProductListItem {
 
 class ShoppingCart {
   items = [];
-  totalValue = 0;
 
   addProductToCart(item) {
-    this.items.push(item);
-    this.render();
+    const isAlreadyExist = this.items.findIndex((el) => el.id === item.id);
+    if (isAlreadyExist === -1) this.items.push(item);
+
+    this._getTotalPrice();
+    this.totalOutput.innerHTML = `<h2>Total $${this._getTotalPrice()}</h2>`;
+  }
+
+  _getTotalPrice() {
+    let totalPrice = 0;
+
+    if (this.items && this.items.length > 0) {
+      this.items.forEach((el) => {
+        totalPrice += el.price ? el.price : 0;
+      });
+    }
+
+    return +totalPrice;
   }
 
   render() {
     const shoppingCartSection = document.createElement("section");
     shoppingCartSection.className = "cart";
     shoppingCartSection.innerHTML = `
-			<h2>Total $${this.totalValue}</h2>
+			<h2>Total $${this._getTotalPrice()}</h2>
 			<button>Order Now!</button>
 		`;
+
+    this.totalOutput = shoppingCartSection.querySelector("h2");
 
     return shoppingCartSection;
   }
 }
 
 class Shop {
+  static cart;
+
   render() {
     const app = document.querySelector("#app");
 
-    const productList = new ProductList().render();
-    const shoppingCart = new ShoppingCart().render();
+    const product = new ProductList();
+    this.cart = new ShoppingCart();
 
-    app.append(shoppingCart);
-    app.append(productList);
+    const cartRender = this.cart.render();
+    const productRender = product.render();
+
+    app.append(cartRender);
+    app.append(productRender);
   }
 }
 
-const shop = new Shop();
-shop.render();
+class App {
+  static cart;
+
+  static init() {
+    const shop = new Shop();
+    shop.render();
+    this.cart = shop.cart;
+  }
+
+  static addProductToCart(product) {
+    this.cart.addProductToCart(product);
+  }
+}
+
+App.init();
