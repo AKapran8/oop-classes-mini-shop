@@ -103,7 +103,8 @@ class ProductListItem extends Component {
 
 class ShoppingCart extends Component {
   #items = [];
-  #totalOutput;
+	#totalOutput;
+	#orderHandler;
 
   set #cartItems(items) {
     this.#items = [...items];
