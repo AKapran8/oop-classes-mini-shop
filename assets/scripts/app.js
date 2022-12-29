@@ -82,7 +82,7 @@ class ShoppingCart {
       sum = this.items.reduce((prev, cur) => (prev += cur.price || 0), 0);
     }
 
-    return +sum;
+    return +sum.toFixed(2);
   }
 
   addProductToCart(item) {
